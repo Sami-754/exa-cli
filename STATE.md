@@ -1,40 +1,45 @@
 # Project State: exa-cli
 
 ## 1. Build Status Summary
-- **Current Milestone:** Milestone 2 — Core Commands (M1 done)
-- **Status:** Working CLI skeleton. `search`/`contents`/`similar`/`answer`/`auth`/`config`/`version` wired.
-- **Production Asset:** `src/exa_cli/` — zero-dep Python (urllib), run via `python3 -m exa_cli.cli` or `PYTHONPATH=src`.
+- **Current Milestone:** All surfaces implemented (skill audit + upgrade complete)
+- **Status:** `search`/`contents`/`similar`/`answer`/`agent`/`monitors`/`batches`/`auth`/`config`/`version` wired.
+- **Production Asset:** `src/exa_cli/` — zero-dep Python (urllib), run via `python3 -m exa_cli.cli` or `exa-cli` (uv tool installed from local path).
 
 ## 2. Integration & Credential Registry
 | Service | Credential Name | Environment Variable | Status | Purpose |
 |:---|:---|:---|:---|:---|
-| Exa API | Exa production key | `EXA_API_KEY` | Unverified (key rejected 401) | `/search`, `/contents`, `/findSimilar`, `/answer` |
+| Exa API | Exa production key | `EXA_API_KEY` | Live-verified (UUID key, 401 on bad key) | `/search`, `/contents`, `/findSimilar`, `/answer`, `/agent/runs`, `/monitors`, `/batches` |
 | Local config | User config file | `~/.config/exa-cli/config.toml` | Working, mode 0600 | Fallback key storage |
 
 Base URL: `https://api.exa.ai` · Auth header: `x-api-key` · Docs: `https://docs.exa.ai`
 
 ## 3. Verified Code Configurations
-- Commands: `search QUERY [--limit N] [--json] [--type TYPE] [--category CAT] [--domain D] [--max-chars N]`,
-  `contents URLS... [--max-chars N] [--json]`, `similar URL [--limit N] [--json]`,
-  `answer QUERY [--stream] [--json]`, `auth login|status|logout`, `config show`, `version`
-- Auth: env `EXA_API_KEY` > `~/.config/exa-cli/config.toml` (0600) > interactive prompt. Display masked `sk_…abcd`.
+- Commands: `search` (pick-one contents: highlights|text|summary|none), `contents` (statuses), `similar` (deprecated note), `answer` (--text/--schema/--prompt/--model/--country/--stream), `agent` (create/get/list/cancel/stop/events + --wait polling + --schema/--prompt + input.data/exclusion + budget), `monitors` (list/create/get/update/delete/trigger/runs/run/batch), `batches` (create/get/list/cancel)
+- Help: every command has `-h/--help` with full flag reference
+- Auth: env `EXA_API_KEY` > `~/.config/exa-cli/config.toml` (0600) > interactive prompt. Display masked.
 - Retry: 3 max, backoff honours `Retry-After` (cap 30s), attempts on stderr. 401/403 → exit 3, 429 → 4, 5xx → 6, network → 5, usage → 2.
 - Stdout = data only (raw JSON under `--json`); stderr = diagnostics.
-- One verified live call so far: bad key correctly exits 3 with `INVALID_API_KEY` body.
+- Skill vendored verbatim at `skills/build-with-exa/` (SKILL.md + 13 references, 2128 lines).
 
 ## 4. Test Payloads & Verification Log
-Stub-server tests (no network, `http.server` on localhost):
+Stub + offline tests:
 - 429 twice → retry → 200: exit 0, 3 attempts. PASSED.
 - 429 exhausted (2 retries): exit 4, attempts on stderr. PASSED.
 - `auth login --key` writes 0600 TOML; `auth status`/`config show` mask. PASSED.
-- `search --help`, `unknowncmd`, missing query, bad key → 0/2/2/3. PASSED.
-- Key never present in `src/` (grep checked). PASSED.
+- All `--help` variants: 0; missing query/unknown cmd: 2; bad key 401 → 3. PASSED.
+- Pick-one contents: default minimal `{highlights:true}` matches skill recommendation. PASSED.
+- Invalid `--content banana` → 2. PASSED.
+- Agent arg parsing bug (first word swallowed as sub) fixed and live-verified.
 
-No live search with a valid key yet — the supplied key returned 401, needs a fresh one from dashboard.
+Live API verified:
+- `search` `--json` exit 0, highlights mode.
+- `contents` URL works, 200-with-empty+statuses error correctly parsed (nonexistent host returns statuses, not crash).
+- `similar` deprecated warning on stderr, results ok.
+- `answer` `--json` + citations, `--stream` passes through.
+- `agent` create → poll running → completed with grounding, exit 0.
+- Full install: `uv tool install --force /home/sami/Tools/exa-cli` → `exa-cli --help` shows new surface.
 
 ## 5. Immediate Next Steps
-1. Get a valid `EXA_API_KEY`, run `exa-cli auth login` (or set env), then live `search "test" --limit 2 --json | jq .`.
-2. Verify `contents`, `similar`, `answer` against live API; fix any schema mismatches.
-3. Recreate `samples/` fixtures from live responses; add exit-code matrix test.
-4. Write `scripts/install.sh` (download binary / `uv tool install` fallback) + curl distribution.
-5. Write `skills/exa-cli/SKILL.md` (CLI adaptation of Exa's MCP skill).
+1. `git commit` + push all upgrades (client refactoring, CLI help/pick-one/agent/monitors/batches, vendored skill).
+2. Write `scripts/install.sh` (uv tool fallback) + publish to PyPI for `uv tool install exa-cli` bare-name path.
+3. Recreate `samples/` fixtures from live responses if desired; add exit-code matrix test.

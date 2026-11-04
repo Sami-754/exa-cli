@@ -69,19 +69,24 @@ stdout (data)  ·  stderr (diagnostics)  ·  exit code
 - [x] `version` / `config` commands operational
 
 ### Milestone 2: Core Commands
-- [ ] `search` with `--limit`, `--domains`, `--category`, `--json`
-- [ ] `contents` (URLs → text/highlights/summary)
-- [ ] `similar` (URL → related pages)
-- [ ] Fixtures in `samples/` drive the parser tests
+- [x] `search` with `--limit`, `--domains`, `--category`, `--json`
+- [x] `contents` (URLs → text/highlights/summary)
+- [x] `similar` (URL → related pages)
+- [x] `answer`, `agent`, `monitors`, `batches` (full skill surface)
 
 ### Milestone 3: Hardening & Distribution
 - [ ] Exit-code contract verified against all four fixtures
 - [ ] `uv tool install` install path verified
 - [ ] README quickstart validated on a clean shell
 
+### Milestone 4: Skill Surface (done)
+- [x] Vendored `skills/build-with-exa/` verbatim (SKILL + 13 refs)
+- [x] Pick-one contents (highlights default = skill recommendation)
+- [x] `agent`, `monitors`, `batches` complete; every command has `-h/--help`
+- [x] Reinstalled binary verified end-to-end (search/contents/similar/answer/agent)
+
 ---
 
 ## 7. Out of Scope (V1)
-- Agentic/deep-research multi-step orchestration (single-shot calls only)
 - Interactive REPL mode
-- Websets, Places, and other Exa endpoints beyond search/contents/findSimilar
+- Websets, Places, and other Exa endpoints beyond search/contents/findSimilar/agent/monitors/batches
