@@ -2,7 +2,7 @@
 
 One-shot agent-native CLI for the Exa API: natural-language search, full-text
 contents, similar pages, and answer synthesis from the terminal, with
-machine-readable output. Mirrors the Exa MCP tools as CLI subcommands.
+machine-readable output.
 
 ## 1. What it is
 
@@ -12,15 +12,8 @@ machine-readable output. Mirrors the Exa MCP tools as CLI subcommands.
 - **Base URL:** `https://api.exa.ai`. Auth header: `x-api-key`.
 - **Source of truth for schemas:** Exa OpenAPI spec
   (`https://exa.ai/docs/exa-spec.yaml`, saved in scratchpad during planning).
-- **MCP mapping:**
 
-| exa-mcp tool | CLI command | Endpoint |
-|---|---|---|
-| `web_search_exa` | `search` | `POST /search` |
-| `web_search_advanced_exa` | `search --advanced` (same cmd, extra flags) | `POST /search` |
-| `web_fetch_exa` | `contents` (alias `fetch`) | `POST /contents` |
-| — | `similar` | `POST /findSimilar` (deprecated upstream, still shipped) |
-| `agent_run` | out of scope for V1 | `/agent/runs` |
+Commands: `search` (`POST /search`, alias not needed), `contents` (`POST /contents`, alias `fetch`), `similar` (`POST /findSimilar`, deprecated upstream), `answer` (`POST /answer`), `agent` (`/agent/runs`), `monitors` (`/monitors`), `batches` (`/batches`).
 
 ## 2. Repo layout (final)
 
@@ -149,12 +142,11 @@ Wrapper over `POST /answer`. Flags: `--json`, `--stream` (SSE passthrough).
 3. **M3 — Hardening & dist.** Exit-code matrix test, install script,
    `uv tool install` verified on clean shell, README quickstart validated.
 
-## 9. Skill (CLI adaptation)
+## 9. Skill (CLI-native)
 
-`skills/exa-cli/SKILL.md` ports Exa's MCP skill: same intents
-(search / fetch / similar / answer) but expressed as shell commands
-(`exa-cli search "…"` etc.) with `--json` discipline and exit-code
-semantics, so agents on machines without MCP can use it.
+`skills/exa-cli/SKILL.md` — the only skill in the repo. CLI-native framing
+of the Exa API (commands + subcommands, `--json` discipline, exit-code
+semantics).
 
 ## 10. Out of scope (V1)
 

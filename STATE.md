@@ -19,7 +19,7 @@ Base URL: `https://api.exa.ai` · Auth header: `x-api-key` · Docs: `https://doc
 - Auth: env `EXA_API_KEY` > `~/.config/exa-cli/config.toml` (0600) > interactive prompt. Display masked.
 - Retry: 3 max, backoff honours `Retry-After` (cap 30s), attempts on stderr. 401/403 → exit 3, 429 → 4, 5xx → 6, network → 5, usage → 2.
 - Stdout = data only (raw JSON under `--json`); stderr = diagnostics.
-- Skill vendored verbatim at `skills/build-with-exa/` (SKILL.md + 13 references, 2128 lines).
+- Skill is `skills/exa-cli/SKILL.md` (CLI-native).
 
 ## 4. Test Payloads & Verification Log
 Stub + offline tests:

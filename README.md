@@ -1,18 +1,20 @@
 # exa-cli
 
-Agent-native CLI for the Exa API. Natural-language search, full-text contents, similar pages, answer synthesis, agent runs, monitors, and batches — mirroring Exa's official `build-with-exa` skill and MCP tools as shell commands. Alias `fetch` for `contents`.
+Agent-native CLI for the Exa API. Natural-language search, full-text contents, similar pages, answer synthesis, agent runs, monitors, and batches. Alias `fetch` for `contents`.
 
-Vendored official skill (verbatim): `skills/build-with-exa/` — see its `SKILL.md` for the recommended request shape and decision workflow.
+Skill (CLI-native): `skills/exa-cli/SKILL.md`.
 
 ## Install
 
 ```bash
-uv tool install exa-cli
-# or
-pipx install exa-cli
-# or (from GitHub)
+# from GitHub (current public path)
 uv tool install git+https://github.com/Sami-754/exa-cli
+
+# or from a local checkout
+uv tool install /path/to/exa-cli
 ```
+
+`uv tool install exa-cli` (PyPI, bare name) will work after the first PyPI publish.
 
 ## Auth
 
@@ -55,7 +57,7 @@ Every command has `-h`/`--help` with full flag reference. Data on stdout, diagno
 ## Ref (full skill)
 
 - Commands: `search` (`--content highlights|text|summary|none`, default highlights per skill), `contents`/`fetch` (statuses-aware), `similar` (deprecated upstream), `answer` (`--text/--schema/--prompt/--model/--country/--stream`), `agent` (`--effort minimal|low|medium|high|xhigh|auto|ultra --schema/--prompt/--data/--exclusion/--previous/--max-cost/--wait`), `monitors` (create/get/update/delete/trigger/runs/run/batch), `batches` (create/get/list/cancel)
-- Vendored skill: `skills/build-with-exa/SKILL.md` + 13 `references/` files
+- Skill: `skills/exa-cli/SKILL.md`
 
 ## Docs
 

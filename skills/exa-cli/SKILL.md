@@ -5,14 +5,12 @@ metadata:
   project: exa-cli
   version: "0.1.0"
   docs: "https://exa.ai/docs"
-  skill-basis: "skills/build-with-exa/SKILL.md (official, verbatim)"
 ---
 
 # Exa CLI
 
-`exa-cli` is the CLI surface for the Exa API. Same semantics as the official
-`build-with-exa` skill and the Exa MCP tools, expressed as **commands +
-subcommands** instead of SDK calls or raw HTTP.
+`exa-cli` is the CLI surface for the Exa API: commands + subcommands that
+call the API directly.
 
 ## Scope
 
@@ -28,9 +26,6 @@ Included:
 - Snapshot: `--snapshot` on search/contents
 
 Out of scope: Websets (deprecated, use Agent), OpenAI-compat endpoints.
-
-Original official skill (SDK/HTTP framing) lives at
-`skills/build-with-exa/` — this file is the CLI adaptation.
 
 ## Installation
 
@@ -186,10 +181,9 @@ exa-cli batches get <ID> | list [--limit N] | cancel <ID>
 
 ## Where the rules live
 
-Command examples above mirror `skills/build-with-exa/references/`:
-
-- `search.md` — request shape, types, categories
-- `contents.md` — statuses, freshness
-- `snapshot.md` — snapshotAsOf
+Command examples are the skill. Flags map directly to the Exa API:
+- `search.md` (search types, content modes, categories)
+- `contents.md` (statuses, freshness)
+- `snapshot.md` (snapshotAsOf)
 - `answer.md`, `agent.md`, `monitors.md`, `http-requests.md`,
   `models-and-modes.md`, `common-mistakes.md`

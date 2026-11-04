@@ -3,8 +3,8 @@
 ## 1. Project Context & Objectives
 - **Project:** `exa-cli`
 - **Objective:** An agent-native command-line client for the Exa API — natural-language web search, full-text content extraction, and similar-page lookup from the terminal, with machine-readable output.
-- **Why it matters:** Turns a research question into cited, full-text JSON in one command, removing the manual scrape-and-stitch loop that agents otherwise spend tool calls on. Mirrors the Exa MCP tools (`web_search_exa`, `web_fetch_exa`) as CLI subcommands.
-- **Full design:** See `PLAN.md` (auth flow, MCP→CLI mapping, distribution via `uv tool` + curl install script, milestones).
+- **Why it matters:** Turns a research question into cited, full-text JSON in one command, removing the manual scrape-and-stitch loop that agents otherwise spend tool calls on.
+- **Full design:** See `PLAN.md` (auth flow, distribution via `uv tool` + curl install script, milestones).
 
 ---
 
@@ -80,7 +80,7 @@ stdout (data)  ·  stderr (diagnostics)  ·  exit code
 - [ ] README quickstart validated on a clean shell
 
 ### Milestone 4: Skill Surface (done)
-- [x] Vendored `skills/build-with-exa/` verbatim (SKILL + 13 refs)
+- [x] Skill is `skills/exa-cli/SKILL.md` (CLI-native)
 - [x] Pick-one contents (highlights default = skill recommendation)
 - [x] `agent`, `monitors`, `batches` complete; every command has `-h/--help`
 - [x] Reinstalled binary verified end-to-end (search/contents/similar/answer/agent)
