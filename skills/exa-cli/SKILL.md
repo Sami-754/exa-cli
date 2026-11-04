@@ -1,6 +1,8 @@
 ---
 name: exa-cli
-description: "Use exa-cli to call the Exa API from the terminal: search, contents extraction, answer, Agent runs, monitors, and batches. Use when you need semantic web retrieval, page content, grounded answers, list-building/enrichment, or scheduled recurring searches — prefer exa-cli commands over SDK/HTTP."
+description: |
+  Use this skill whenever a task needs the web: searching for information, checking current facts or news, finding sources, reading a URL, finding a page on a site, extracting full-page content, getting a grounded answer with citations, building a list or enriching a dataset, or watching a topic/site for new results over time. Use it for anything past your training data or anything the user wants verified online. Prefer exa-cli commands over SDK/HTTP.
+allowed-tools: Bash(exa-cli *)
 metadata:
   project: exa-cli
   version: "0.1.0"
@@ -10,7 +12,8 @@ metadata:
 # Exa CLI
 
 `exa-cli` is the CLI surface for the Exa API: commands + subcommands that
-call the API directly.
+call the API directly. Run `exa-cli --help` or `exa-cli <command> --help`
+for full option details.
 
 ## Scope
 
@@ -27,48 +30,91 @@ Included:
 
 Out of scope: Websets (deprecated, use Agent), OpenAI-compat endpoints.
 
-## Installation
+## Prerequisites
+
+Must be installed and authenticated. Check with `exa-cli auth status`.
 
 ```bash
-uv tool install exa-cli
-# or: pipx install exa-cli
-# or from source: uv tool install git+https://github.com/Sami-754/exa-cli
+exa-cli auth status
+# logged_in key=sk_…abcd
 ```
 
-## Authentication
+- **Key resolution:** `EXA_API_KEY` > `~/.config/exa-cli/config.toml` (0600) > prompt.
+- **Display is always masked** (`sk_…`).
+- **Base URL:** `https://api.exa.ai`, header `x-api-key`.
+
+If not ready:
 
 ```bash
 export EXA_API_KEY="your_api_key_here"
 # or first-run prompt
 exa-cli auth login
-exa-cli auth status
-exa-cli auth logout
-exa-cli config show
 ```
 
-- Key resolution: `EXA_API_KEY` > `~/.config/exa-cli/config.toml` (0600) > prompt.
-- Display is always masked (`sk_…`).
-- Base URL: `https://api.exa.ai`, header `x-api-key`.
+Before doing real work, verify the setup with one small request:
+
+```bash
+exa-cli search "what is exa ai" --limit 1 --json
+```
+
+## Workflow
+
+Follow this escalation pattern:
+
+1. **Search** - No specific URL yet. Find pages, answer questions, discover sources.
+2. **Contents** - Have a URL. Extract its content directly.
+3. **Answer** - Need a grounded answer with citations fast, no need for raw sources.
+4. **Agent** - Complex multi-step research, list-building, or enrichment with schema.
+5. **Monitor** - Need recurring checks or ongoing alerts on a topic. Prefer a monitor over repeated one-off searches.
+6. **Batch** - Need many requests at once (async). Submit via batches, poll status.
+
+| Need                        | Command               | When                                                      |
+| --------------------------- | --------------------- | --------------------------------------------------------- |
+| Find pages on a topic       | `search`              | No specific URL yet                                       |
+| Get a page's content        | `contents`            | Have a URL, static or JS-rendered                         |
+| Grounded answer + citations | `answer`              | Fast answer, no need to read sources yourself             |
+| Multi-step research / list  | `agent`               | Structured output, web research, enrichment               |
+| Watch topics for changes    | `monitors`            | Schedule recurring searches, webhook on new results       |
+| Bulk async requests         | `batches`             | Submit many search/contents/agent requests at once        |
+| Auth / config               | `auth` / `config`     | Login, logout, status, show masked config                 |
 
 Every command has `-h`/`--help`. Data → stdout, diagnostics → stderr,
 `--json` parses with zero preprocessing.
 
-## Quick Start
+## How to use it (do's)
 
-```bash
-exa-cli search "latest developments in LLMs"
-exa-cli search "latest developments in LLMs" --limit 5 --json
-exa-cli search "deep research into RAG evals" --type deep
-exa-cli search "battery breakthroughs" --content text --max-chars 2000
-exa-cli contents https://arxiv.org/abs/2307.06435
-exa-cli contents https://exa.ai/blog/atlas-benchmark --content text --max-chars 4000
-exa-cli answer "What is the latest valuation of SpaceX?" --json
-exa-cli agent "Find engineering leaders at AI infra companies" --effort auto --wait
-exa-cli monitors list
-exa-cli batches list
-```
+**Search:**
+- **Write queries for a search engine.** Use names and terms you expect on the page, not the user's whole request. Split a question with several parts into one focused search per part.
+- **Keep result counts tight.** Default `--limit 10`; raise only when you genuinely need a broad sweep. Narrow with `--domain`, `--exclude-domain`, `--from`, `--to`, `--category`, `--fresh`.
+- **Pick exactly one content mode** (`highlights|text|summary|none`, default highlights). Never stack highlights+text+summary. `--content summary` requires an explicit user request for per-result synthesis.
+- **Gated flags only.** Any extra flag must be task-justified (e.g. `--type deep` only when the user asked for deep research, `--max-chars` only with `--content text`).
 
-## Command reference
+**Contents:**
+- URLs can be args or stdin (one per line). `statuses` in the response mean HTTP 200 ≠ all URLs succeeded — check non-`success` statuses.
+- Top-level fields are used (not nested under `contents`).
+
+**Answer / Agent:**
+- Prefer `search` when the app already has its own LLM. `answer` is for a grounded answer + citations without reading sources yourself.
+- `agent` lifecycle: create → `id` (`agent_run_*`) → poll `get` until `completed|failed|cancelled` → only `completed` carries `output`. Always set `--effort` explicitly.
+
+**Monitors:**
+- `--webhook` is required on create (HTTPS; localhost/private rejected). `webhookSecret` is returned **once** at creation — save it immediately.
+- Update: `--pause`/`--resume`, `--query`, `--interval`, `--webhook`, `--metadata K=V`.
+- Bias toward `monitors` when the user's goal is ongoing change detection or alerting over time. For a single topic/site, default to `monitors create` with `--query` and `--webhook`.
+
+**Batches:**
+- Useful when you need many requests at once. Submit via `batches create --mode search|contents|agent`, then `batches get`.
+
+## When to stop
+
+- Stop once two independent sources agree on a fact.
+- Before you answer, close any gap your draft would mark unconfirmed: run one targeted search or reread the recommended pages.
+- For releases, ownership, official figures and decisions by a named body, confirm on the official domain. A secondary site or a generated answer is not enough.
+- Don't keep raising `--limit` to get "more" — narrow with filters instead.
+
+## Hand off the job
+
+When the user wants an in-depth report that needs many sources gathered and weighed (comparison across criteria, deep investigation), use `agent` with `--effort auto` or `deep` instead of doing many manual searches. If it isn't available, fall back to `search --type deep`.
 
 ### `exa-cli search QUERY [flags]`
 

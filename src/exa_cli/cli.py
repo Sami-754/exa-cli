@@ -1,5 +1,6 @@
 import json
 import sys
+from pathlib import Path
 
 from . import __version__
 from .config import config_path, ensure_key, load_key, mask, save_key
@@ -1010,8 +1011,77 @@ def cmd_config(args: list[str]) -> int:
     return 2
 
 
+def _copy_skill() -> None:
+    """Copy skills/exa-cli/SKILL.md to ~/.agents/skills/exa-cli/ if the wheel
+    ships it (importlib.resources, hatch sdist) or, for dev also fall back to
+    ./skills/exa-cli/SKILL.md if importlib fails."""
+    import shutil, importlib.metadata
+    try:
+        from importlib import resources
+    except ImportError:
+        resources = None  # type: ignore
+
+    src_name = "SKILL.md"
+    content = None
+
+    # ── attempt importlib.resources (installed on PATH via pip/pipx/uv) ──
+    if resources is not None:
+        try:
+            skill_pkg = resources.files("exa_cli") / "skills" / "exa-cli" / src_name
+            if skill_pkg.is_file():
+                content = skill_pkg.read_bytes()
+        except (TypeError, AttributeError, ModuleNotFoundError):
+            content = None
+
+    # ── fallback: look up the package dir (handles `pip install -e/uv tool`
+    #    where the wheel isn't a package dir) ──
+    if content is None:
+        try:
+            dist = importlib.metadata.distribution("exa-cli")
+            for f in dist.files or []:
+                name = str(f).replace("\\", "/")
+                if name.endswith("skills/exa-cli/SKILL.md"):
+                    content = (dist.locate_file(f)).read_bytes()
+                    break
+        except Exception:
+            pass
+
+    # ── fallback: ./skills/exa-cli/SKILL.md relative to cwd or to __file__ ──
+    if content is None:
+        try:
+            local = Path(__file__).resolve().parents[2] / "skills" / "exa-cli" / src_name
+            if local.is_file():
+                content = local.read_bytes()
+            else:
+                local2 = Path.cwd() / "skills" / "exa-cli" / src_name
+                if local2.is_file():
+                    content = local2.read_bytes()
+        except Exception:
+            pass
+
+    if content is None:
+        print("warning: skill not found in package; skipping copy to ~/.agents/skills", file=sys.stderr)
+        return
+
+    dest_dir = Path.home() / ".agents" / "skills" / "exa-cli"
+    try:
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        dest = dest_dir / src_name
+        dest.write_bytes(content)
+        print(f"skill copied to {dest}", file=sys.stderr)
+    except Exception as e:
+        print(f"warning: could not copy skill to {dest_dir}: {e}", file=sys.stderr)
+
+
 def main(argv: list[str] | None = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
+    # Auto-install skill on any invocation (silent if already exists / fails)
+    if not getattr(main, "_skill_tried", False):
+        try:
+            _copy_skill()
+        except Exception:
+            pass
+        main._skill_tried = True  # type: ignore[attr-defined]
     if not args or args[0] in ("-h", "--help", "help"):
         print(
             "exa-cli — agent-native CLI for the Exa API\n"
