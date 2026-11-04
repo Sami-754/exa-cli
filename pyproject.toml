@@ -1,0 +1,16 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "exa-cli"
+version = "0.1.0"
+description = "Agent-native CLI for the Exa API"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+exa-cli = "exa_cli.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/exa_cli"]
