@@ -1,9 +1,9 @@
 # Project State: exa-cli
 
 ## 1. Build Status Summary
-- **Current Milestone:** All surfaces implemented (skill audit + upgrade complete)
-- **Status:** `search`/`contents`/`similar`/`answer`/`agent`/`monitors`/`batches`/`auth`/`config`/`version` wired.
-- **Production Asset:** `src/exa_cli/` — zero-dep Python (urllib), run via `python3 -m exa_cli.cli` or `exa-cli` (uv tool installed from local path).
+- **Current Milestone:** Complete JavaScript / Node.js / Bun rewrite (zero external dependencies)
+- **Status:** `search`/`contents`/`similar`/`answer`/`agent`/`monitors`/`batches`/`auth`/`config`/`version` wired in pure ES module JavaScript.
+- **Production Asset:** `src/cli.js`, `src/client.js`, `src/config.js`, `bin/exa-cli.js` — zero-dep Node 18+ / Bun (native `fetch`), installed via `bun`, `pnpm`, or `npm`.
 
 ## 2. Integration & Credential Registry
 | Service | Credential Name | Environment Variable | Status | Purpose |

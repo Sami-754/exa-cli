@@ -3,25 +3,19 @@
 .env.*
 !.env.example
 
-# Python
-__pycache__/
-*.py[cod]
-.venv/
-venv/
-*.egg-info/
+# Node / JS
+node_modules/
 dist/
-build/
-.uv/
-uv.lock
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
 # Tooling / editors
-.pytest_cache/
-.ruff_cache/
-.mypy_cache/
 .idea/
 .vscode/
 .DS_Store
 
 # Local artifacts
-.firecrawl/
 *.log

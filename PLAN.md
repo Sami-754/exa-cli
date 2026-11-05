@@ -6,7 +6,7 @@ machine-readable output.
 
 ## 1. What it is
 
-- **Runtime:** Python 3.11+, Typer (CLI), httpx (HTTP), Rich (tables).
+- **Runtime:** Node.js 18+, Bun, or pnpm (zero external dependencies, native fetch).
 - **Entry point:** `exa-cli` (deliberately never `exa` — that is eza on this
   machine).
 - **Base URL:** `https://api.exa.ai`. Auth header: `x-api-key`.
@@ -26,16 +26,17 @@ exa-cli/
 ├── PLAN.md            # THIS FILE — design + milestones
 ├── .env.example
 ├── .gitignore
+├── package.json       # Node.js / Bun / pnpm package
+├── bin/
+│   └── exa-cli.js     # executable entry point (#!/usr/bin/env node)
 ├── skills/
-│   └── exa-cli/       # agent skill (CLI adaptation of Exa's skill)
+│   └── exa-cli/       # agent skill
 │       └── SKILL.md
-└── src/exa_cli/       # to be built (M1)
-    ├── __init__.py    # __version__ = "0.1.0"
-    ├── cli.py         # Typer app, commands, exit-code mapping
-    ├── config.py      # key resolution + first-run prompt + 0600 storage
-    ├── client.py      # httpx client, retry/backoff, status → exit code
-    ├── models.py      # typed request/response payloads, validation
-    └── render.py      # json | table | markdown output, truncation
+└── src/
+    ├── cli.js         # commands routing, flag parsing, exit-code mapping
+    ├── client.js      # native fetch HTTP client, retry/backoff, status → exit code
+    ├── config.js      # key resolution + first-run prompt + 0600 storage
+    └── version.js     # version string
 ```
 
 `pyproject.toml`, `samples/`, and the old `src/` stub were removed —

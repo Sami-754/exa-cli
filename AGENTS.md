@@ -43,11 +43,11 @@ stdout (data)  ·  stderr (diagnostics)  ·  exit code
 ## 4. Key Components Reference
 | # | Component | Type | Responsibility |
 |:--|:----------|:-----|:---------------|
-| 1 | `cli.py` | Typer app | Command surface, flag parsing, exit-code mapping |
-| 2 | `client.py` | HTTP client | Auth header, timeouts, retry/backoff on 429 + 5xx |
-| 3 | `models.py` | Typed payloads | Request/response schemas, validation |
-| 4 | `render.py` | Formatter | table / json / markdown output, truncation |
-| 5 | `config.py` | Config loader | `EXA_API_KEY` env > `~/.config/exa-cli/config.toml` |
+| 1 | `bin/exa-cli.js` | Executable | Node entry point (`#!/usr/bin/env node`) |
+| 2 | `src/cli.js` | CLI Router | Command surface, flag parsing, exit-code mapping |
+| 3 | `src/client.js` | HTTP Client | Auth header, timeouts, retry/backoff on 429 + 5xx |
+| 4 | `src/config.js` | Config Loader | `EXA_API_KEY` env > `~/.config/exa-cli/config.toml` |
+| 5 | `src/version.js` | Metadata | Semantic version reference |
 
 ---
 
