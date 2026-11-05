@@ -7,17 +7,8 @@ Skill (CLI-native): `skills/exa-cli/SKILL.md`.
 ## Install
 
 ```bash
-# one-liner: installs binary + copies skill to ~/.agents/skills/exa-cli/
 curl -fsSL https://raw.githubusercontent.com/Sami-754/exa-cli/master/scripts/install.sh | bash
-
-# or directly via uv tool
-uv tool install git+https://github.com/Sami-754/exa-cli
-
-# or from a local checkout
-uv tool install /path/to/exa-cli
 ```
-
-`uv tool install exa-cli` (PyPI, bare name) will work after the first PyPI publish.
 
 ## Auth
 
