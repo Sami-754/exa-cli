@@ -1,5 +1,7 @@
 # exa-cli
 
+> **Disclaimer:** This is an independent, unofficial community tool and is not affiliated with, sponsored by, or endorsed by Exa (Exa Labs, Inc.).
+
 Agent-native CLI for the Exa API. Natural-language search, full-text contents, similar pages, answer synthesis, agent runs, monitors, and batches. Alias `fetch` for `contents`.
 
 Skill (CLI-native): `skills/exa-cli/SKILL.md`.

@@ -1212,7 +1212,7 @@ export async function cmdUninstall(args) {
 
 export async function runCLI(argv = process.argv.slice(2)) {
   if (argv.length === 0 || argv[0] === "-h" || argv[0] === "--help" || argv[0] === "help") {
-    console.log(`exa-cli — agent-native CLI for the Exa API
+    console.log(`exa-cli — unofficial agent-native CLI for the Exa API
 
 usage: exa-cli <command> [args]
 

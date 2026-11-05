@@ -1,7 +1,7 @@
 {
   "name": "exa-cli",
   "version": "0.1.0",
-  "description": "Agent-native CLI for the Exa API",
+  "description": "Unofficial agent-native CLI for the Exa API",
   "type": "module",
   "bin": {
     "exa-cli": "./bin/exa-cli.js"
