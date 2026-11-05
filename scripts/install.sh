@@ -12,33 +12,32 @@ SKILL_FILE="${SKILL_DIR}/SKILL.md"
 echo "==> Installing exa-cli..."
 
 # Detect package manager: bun > pnpm > npm
-if command -v bun >/dev/null 2>&1; then
-    PM="bun"
-    if [ -f "package.json" ] && grep -q '"name": "exa-cli"' package.json 2>/dev/null; then
-        echo "--> Installing from local checkout using bun..."
-        bun add -g .
-    else
-        echo "--> Installing from GitHub using bun..."
-        bun add -g "git+https://github.com/${REPO}.git"
-    fi
-elif command -v pnpm >/dev/null 2>&1; then
-    PM="pnpm"
-    if [ -f "package.json" ] && grep -q '"name": "exa-cli"' package.json 2>/dev/null; then
-        echo "--> Installing from local checkout using pnpm..."
-        pnpm add -g .
-    else
-        echo "--> Installing from GitHub using pnpm..."
-        pnpm add -g "git+https://github.com/${REPO}.git"
-    fi
-elif command -v npm >/dev/null 2>&1; then
-    PM="npm"
-    if [ -f "package.json" ] && grep -q '"name": "exa-cli"' package.json 2>/dev/null; then
+if [ -f "package.json" ] && grep -q '"name": "exa-cli"' package.json 2>/dev/null; then
+    if command -v npm >/dev/null 2>&1; then
+        PM="npm"
         echo "--> Installing from local checkout using npm..."
         npm install -g .
-    else
-        echo "--> Installing from GitHub using npm..."
-        npm install -g "git+https://github.com/${REPO}.git"
+    elif command -v bun >/dev/null 2>&1; then
+        PM="bun"
+        echo "--> Installing from local checkout using bun..."
+        bun add -g file:$(pwd)
+    elif command -v pnpm >/dev/null 2>&1; then
+        PM="pnpm"
+        echo "--> Installing from local checkout using pnpm..."
+        pnpm add -g .
     fi
+elif command -v bun >/dev/null 2>&1; then
+    PM="bun"
+    echo "--> Installing from GitHub using bun..."
+    bun add -g "git+https://github.com/${REPO}.git"
+elif command -v pnpm >/dev/null 2>&1; then
+    PM="pnpm"
+    echo "--> Installing from GitHub using pnpm..."
+    pnpm add -g "git+https://github.com/${REPO}.git"
+elif command -v npm >/dev/null 2>&1; then
+    PM="npm"
+    echo "--> Installing from GitHub using npm..."
+    npm install -g "git+https://github.com/${REPO}.git"
 else
     echo "Error: no supported JavaScript package manager found (bun, pnpm, or npm is required)." >&2
     echo "Install Bun (https://bun.sh) or Node.js (https://nodejs.org) to continue." >&2
