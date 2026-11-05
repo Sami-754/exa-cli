@@ -68,3 +68,7 @@ Every command has `-h`/`--help` with full flag reference. Data on stdout, diagno
 - `AGENTS.md` — invariants, architecture
 - `PLAN.md` — design + milestones
 - `STATE.md` — live build status
+
+---
+
+<sub>Deepseek made ts</sub>
