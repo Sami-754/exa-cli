@@ -14,13 +14,13 @@
 Base URL: `https://api.exa.ai` · Auth header: `x-api-key` · Docs: `https://docs.exa.ai`
 
 ## 3. Verified Code Configurations
-- Commands: `search` (pick-one contents: highlights|text|summary|none), `contents` (statuses), `similar` (deprecated note), `answer` (--text/--schema/--prompt/--model/--country/--stream), `agent` (create/get/list/cancel/stop/events + --wait polling + --schema/--prompt + input.data/exclusion + budget), `monitors` (list/create/get/update/delete/trigger/runs/run/batch), `batches` (create/get/list/cancel)
+- Commands: `search` (pick-one contents: highlights|text|summary|none), `contents` (statuses), `similar` (deprecated note), `answer` (--text/--schema/--prompt/--model/--country/--stream), `agent` (create/get/list/cancel/stop/events + --wait polling + --schema/--prompt + input.data/exclusion + budget), `monitors` (list/create/get/update/delete/trigger/runs/run/batch), `batches` (create/get/list/cancel), `uninstall` (--yes)
 - Help: every command has `-h/--help` with full flag reference
 - Auth: env `EXA_API_KEY` > `~/.config/exa-cli/config.toml` (0600) > interactive prompt. Display masked.
 - Retry: 3 max, backoff honours `Retry-After` (cap 30s), attempts on stderr. 401/403 → exit 3, 429 → 4, 5xx → 6, network → 5, usage → 2.
 - Stdout = data only (raw JSON under `--json`); stderr = diagnostics.
-- Skill is `skills/exa-cli/SKILL.md` (CLI-native), packaged via `force-include` in wheel and installed via `scripts/install.sh` to `~/.agents/skills/exa-cli/SKILL.md`.
-- Runtime `_copy_skill` is completely silent (no warning if absent, idempotent skip if matching).
+- Skill is `skills/exa-cli/SKILL.md` (CLI-native), installed via `scripts/install.sh` to `~/.agents/skills/exa-cli/SKILL.md` and cleaned via `exa-cli uninstall`.
+- Uninstallation: `exa-cli uninstall` and `scripts/uninstall.sh` wipe bin, skill, and config.
 
 ## 4. Test Payloads & Verification Log
 Stub + offline tests:

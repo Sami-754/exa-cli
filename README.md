@@ -10,6 +10,14 @@ Skill (CLI-native): `skills/exa-cli/SKILL.md`.
 curl -fsSL https://raw.githubusercontent.com/Sami-754/exa-cli/master/scripts/install.sh | bash
 ```
 
+## Uninstall
+
+```bash
+exa-cli uninstall
+# or one-liner:
+# curl -fsSL https://raw.githubusercontent.com/Sami-754/exa-cli/master/scripts/uninstall.sh | bash
+```
+
 ## Auth
 
 ```bash

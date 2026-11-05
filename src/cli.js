@@ -1,10 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import { execSync } from "node:child_process";
+import readline from "node:readline/promises";
 import { fileURLToPath } from "node:url";
 
 import { VERSION } from "./version.js";
-import { configPath, ensureKey, loadKey, mask, saveKey } from "./config.js";
+import { configDir, configPath, ensureKey, loadKey, mask, saveKey } from "./config.js";
 import * as client from "./client.js";
 
 const SEARCH_HELP = `search QUERY [--limit N] [--type TYPE] [--category CAT] [--domain D] [--exclude-domain D]
@@ -1135,6 +1137,79 @@ export async function cmdConfig(args) {
   return 2;
 }
 
+export async function cmdUninstall(args) {
+  if (args.some((a) => a === "-h" || a === "--help")) {
+    console.log(`uninstall [--yes|-y]
+  Completely removes exa-cli, including:
+  - Agent skill (~/.agents/skills/exa-cli)
+  - Config directory and stored API keys (~/.config/exa-cli)
+  - Global CLI binary (via npm, bun, or pnpm)`);
+    return 0;
+  }
+
+  const assumeYes = args.includes("-y") || args.includes("--yes");
+  if (!assumeYes) {
+    if (!process.stdin.isTTY) {
+      console.error("error: confirmation required in non-interactive environment (use --yes)");
+      return 2;
+    }
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stderr,
+    });
+    const ans = (await rl.question("Are you sure you want to completely uninstall exa-cli, config, and skills? [y/N]: ")).trim().toLowerCase();
+    rl.close();
+    if (ans !== "y" && ans !== "yes") {
+      console.log("Uninstallation cancelled.");
+      return 0;
+    }
+  }
+
+  // 1. Remove skill directory
+  const skillDir = path.join(os.homedir(), ".agents", "skills", "exa-cli");
+  if (fs.existsSync(skillDir)) {
+    try {
+      fs.rmSync(skillDir, { recursive: true, force: true });
+      console.log(`✓ Removed agent skill (${skillDir})`);
+    } catch (e) {
+      console.error(`warning: could not remove skill dir: ${e.message}`);
+    }
+  }
+
+  // 2. Remove config directory and keys
+  const cfgDir = configDir();
+  if (fs.existsSync(cfgDir)) {
+    try {
+      fs.rmSync(cfgDir, { recursive: true, force: true });
+      console.log(`✓ Removed configuration directory (${cfgDir})`);
+    } catch (e) {
+      console.error(`warning: could not remove config dir: ${e.message}`);
+    }
+  }
+
+  // 3. Uninstall global package using detected package managers
+  console.log("Removing exa-cli binary...");
+  for (const cmd of ["npm uninstall -g exa-cli", "bun remove -g exa-cli", "pnpm remove -g exa-cli"]) {
+    try {
+      execSync(cmd, { stdio: "ignore" });
+    } catch {
+      // ignore
+    }
+  }
+
+  const localBin = path.join(os.homedir(), ".local", "bin", "exa-cli");
+  if (fs.existsSync(localBin)) {
+    try {
+      fs.unlinkSync(localBin);
+    } catch {
+      // ignore
+    }
+  }
+
+  console.log("✓ exa-cli has been completely uninstalled.");
+  return 0;
+}
+
 export async function runCLI(argv = process.argv.slice(2)) {
   if (argv.length === 0 || argv[0] === "-h" || argv[0] === "--help" || argv[0] === "help") {
     console.log(`exa-cli — agent-native CLI for the Exa API
@@ -1153,6 +1228,7 @@ commands:
   batches create|get ID|list|cancel ID
   auth login|status|logout
   config show
+  uninstall [--yes]
   version
 
 run \`exa-cli <command> --help\` for per-command flags`);
@@ -1190,6 +1266,9 @@ run \`exa-cli <command> --help\` for per-command flags`);
   }
   if (cmd === "config") {
     return await cmdConfig(rest);
+  }
+  if (cmd === "uninstall") {
+    return await cmdUninstall(rest);
   }
 
   console.error(`unknown command: ${cmd}`);
