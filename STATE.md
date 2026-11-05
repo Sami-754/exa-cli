@@ -19,7 +19,8 @@ Base URL: `https://api.exa.ai` · Auth header: `x-api-key` · Docs: `https://doc
 - Auth: env `EXA_API_KEY` > `~/.config/exa-cli/config.toml` (0600) > interactive prompt. Display masked.
 - Retry: 3 max, backoff honours `Retry-After` (cap 30s), attempts on stderr. 401/403 → exit 3, 429 → 4, 5xx → 6, network → 5, usage → 2.
 - Stdout = data only (raw JSON under `--json`); stderr = diagnostics.
-- Skill is `skills/exa-cli/SKILL.md` (CLI-native).
+- Skill is `skills/exa-cli/SKILL.md` (CLI-native), packaged via `force-include` in wheel and installed via `scripts/install.sh` to `~/.agents/skills/exa-cli/SKILL.md`.
+- Runtime `_copy_skill` is completely silent (no warning if absent, idempotent skip if matching).
 
 ## 4. Test Payloads & Verification Log
 Stub + offline tests:
@@ -30,6 +31,8 @@ Stub + offline tests:
 - Pick-one contents: default minimal `{highlights:true}` matches skill recommendation. PASSED.
 - Invalid `--content banana` → 2. PASSED.
 - Agent arg parsing bug (first word swallowed as sub) fixed and live-verified.
+- `scripts/install.sh` verified: builds/installs wheel and installs skill cleanly.
+- `cd ~ && exa-cli search "..." --json | jq .` clean without stderr or stdout warning noise. PASSED.
 
 Live API verified:
 - `search` `--json` exit 0, highlights mode.
@@ -40,6 +43,6 @@ Live API verified:
 - Full install: `uv tool install --force /home/sami/Tools/exa-cli` → `exa-cli --help` shows new surface.
 
 ## 5. Immediate Next Steps
-1. `git commit` + push all upgrades (client refactoring, CLI help/pick-one/agent/monitors/batches, vendored skill).
-2. Write `scripts/install.sh` (uv tool fallback) + publish to PyPI for `uv tool install exa-cli` bare-name path.
+1. `git commit` + push all upgrades (`install.sh`, `pyproject.toml` wheel force-include, silent skill handling, updated README).
+2. Publish to PyPI for `uv tool install exa-cli` bare-name path.
 3. Recreate `samples/` fixtures from live responses if desired; add exit-code matrix test.

@@ -15,5 +15,8 @@ exa-cli = "exa_cli.cli:main"
 [tool.hatch.build.targets.wheel]
 packages = ["src/exa_cli"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"skills" = "exa_cli/skills"
+
 [tool.hatch.build.targets.sdist]
 packages = ["src/exa_cli", "skills"]

@@ -1060,17 +1060,17 @@ def _copy_skill() -> None:
             pass
 
     if content is None:
-        print("warning: skill not found in package; skipping copy to ~/.agents/skills", file=sys.stderr)
         return
 
     dest_dir = Path.home() / ".agents" / "skills" / "exa-cli"
     try:
         dest_dir.mkdir(parents=True, exist_ok=True)
         dest = dest_dir / src_name
+        if dest.is_file() and dest.read_bytes() == content:
+            return
         dest.write_bytes(content)
-        print(f"skill copied to {dest}", file=sys.stderr)
-    except Exception as e:
-        print(f"warning: could not copy skill to {dest_dir}: {e}", file=sys.stderr)
+    except Exception:
+        pass
 
 
 def main(argv: list[str] | None = None) -> int:
